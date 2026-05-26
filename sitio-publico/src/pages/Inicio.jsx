@@ -7,30 +7,48 @@ import FiltroSectores from '../components/FiltroSectores'
 export default function Inicio() {
   const [cursos, setCursos] = useState([])
   const [sectores, setSectores] = useState([])
+  const [slides, setSlides] = useState([])
   const [sectorActivo, setSectorActivo] = useState(null)
   const [cargando, setCargando] = useState(true)
+  const [slideActual, setSlideActual] = useState(0)
+
+  // Avanza el slide automáticamente cada 5 segundos
+  useEffect(() => {
+    if (slides.length <= 1) return
+    const intervalo = setInterval(() => {
+      setSlideActual(prev => (prev + 1) % slides.length)
+    }, 5000)
+    return () => clearInterval(intervalo)
+  }, [slides.length])
 
   useEffect(() => {
     cargarDatos()
   }, [])
 
   async function cargarDatos() {
-    // Carga sectores y cursos activos en paralelo
-    const [resSectores, resCursos] = await Promise.all([
-      supabase.from('sectores').select('*').order('orden'),
+    const [resBanners, resSectores, resCursos] = await Promise.all([
+      supabase
+        .from('banners')
+        .select('*')
+        .eq('activo', true)
+        .order('orden', { ascending: true }),
+      supabase
+        .from('sectores')
+        .select('*')
+        .order('orden'),
       supabase
         .from('cursos')
         .select('*, sectores(nombre)')
-        .eq('activo', true)              // solo cursos visibles
+        .eq('activo', true)
         .order('creado_en', { ascending: false }),
     ])
 
+    if (resBanners.data) setSlides(resBanners.data)
     if (resSectores.data) setSectores(resSectores.data)
     if (resCursos.data) setCursos(resCursos.data)
     setCargando(false)
   }
 
-  // Filtra según el sector seleccionado
   const cursosFiltrados = sectorActivo
     ? cursos.filter(c => c.sector_id === sectorActivo)
     : cursos
@@ -42,64 +60,176 @@ export default function Inicio() {
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
 
-      {/* Encabezado */}
-      <header style={{ background: '#39A900', padding: '14px 24px', display: 'flex', alignItems: 'center', gap: '12px' }}>
-        <div style={{
-          width: '40px', height: '40px',
-          background: 'white',
-          borderRadius: '8px',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontSize: '11px', fontWeight: '700', color: '#39A900',
-          flexShrink: 0,
-        }}>
-          SENA
+      {/* ── Encabezado ── */}
+      <header style={{
+        background: 'white',
+        borderBottom: '1px solid #e5e7eb',
+        padding: '10px 24px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <div style={{
+            width: '44px', height: '44px',
+            background: '#39A900',
+            borderRadius: '8px',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            color: 'white', fontWeight: '700', fontSize: '12px',
+            flexShrink: 0,
+          }}>
+            SENA
+          </div>
+          <div>
+            <p style={{ fontWeight: '600', fontSize: '14px', color: '#1a1a1a' }}>
+              Centro de Desarrollo Agroindustrial, Turístico y Tecnológico del Guaviare
+            </p>
+            <p style={{ fontSize: '12px', color: '#6b7280' }}>
+              CDATTG · Regional Guaviare
+            </p>
+          </div>
         </div>
-        <div>
-          <p style={{ color: 'white', fontWeight: '600', fontSize: '15px' }}>
-            Programas de Formación Técnica
-          </p>
-          <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: '12px' }}>
-            Regional Guaviare · Articulación con la Media
-          </p>
+        <div style={{
+          background: '#5b2d8e',
+          color: 'white',
+          padding: '5px 14px',
+          borderRadius: '20px',
+          fontSize: '12px',
+          fontWeight: '500',
+          whiteSpace: 'nowrap',
+        }}>
+          Articulación con la Media
         </div>
       </header>
 
-      {/* Hero */}
-      <section style={{
-        background: 'var(--verde-claro)',
-        padding: '28px 24px 20px',
-        borderBottom: '1px solid var(--verde-medio)',
-      }}>
-        <h1 style={{ fontSize: '20px', fontWeight: '600', color: 'var(--verde-oscuro)', lineHeight: '1.3' }}>
-          Formación gratuita y de calidad<br />para tu región
-        </h1>
-        <p style={{ fontSize: '13px', color: 'var(--texto-suave)', marginTop: '6px', maxWidth: '520px' }}>
-          Programas técnicos que se articulan con tecnológicos y carreras universitarias.
-          Atrévete a formarte con el SENA.
-        </p>
-      </section>
+      {/* ── Banner slider con imágenes reales ── */}
+      {slides.length > 0 && (
+        <section style={{
+          position: 'relative',
+          height: '320px',
+          overflow: 'hidden',
+          background: '#1a5c00',
+        }}>
+          {/* Imagen de fondo */}
+          <img
+            src={slides[slideActual]?.imagen_url}
+            alt={slides[slideActual]?.titulo ?? 'Banner'}
+            style={{
+              width: '100%', height: '100%',
+              objectFit: 'cover',
+              transition: 'opacity 0.5s',
+            }}
+          />
 
-      {/* Filtros */}
+          {/* Overlay para legibilidad del texto */}
+          <div style={{
+            position: 'absolute', inset: 0,
+            background: 'linear-gradient(to right, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.1) 100%)',
+          }} />
+
+          {/* Texto sobre la imagen */}
+          {(slides[slideActual]?.titulo || slides[slideActual]?.subtitulo) && (
+            <div style={{
+              position: 'absolute', bottom: '40px', left: '32px',
+            }}>
+              {slides[slideActual]?.titulo && (
+                <h1 style={{ color: 'white', fontSize: '26px', fontWeight: '700', marginBottom: '4px' }}>
+                  {slides[slideActual].titulo}
+                </h1>
+              )}
+              {slides[slideActual]?.subtitulo && (
+                <p style={{ color: 'rgba(255,255,255,0.85)', fontSize: '16px' }}>
+                  {slides[slideActual].subtitulo}
+                </p>
+              )}
+            </div>
+          )}
+
+          {/* Puntos de navegación */}
+          <div style={{
+            position: 'absolute', bottom: '14px', left: '50%',
+            transform: 'translateX(-50%)',
+            display: 'flex', gap: '8px',
+          }}>
+            {slides.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => setSlideActual(i)}
+                style={{
+                  width: i === slideActual ? '24px' : '8px',
+                  height: '8px', borderRadius: '4px',
+                  border: 'none', padding: 0, cursor: 'pointer',
+                  background: i === slideActual ? 'white' : 'rgba(255,255,255,0.4)',
+                  transition: 'all 0.3s',
+                }}
+              />
+            ))}
+          </div>
+
+          {/* Flechas — solo si hay más de un banner */}
+          {slides.length > 1 && (
+            <>
+              <button
+                onClick={() => setSlideActual(prev => (prev - 1 + slides.length) % slides.length)}
+                style={{
+                  position: 'absolute', left: '12px', top: '50%',
+                  transform: 'translateY(-50%)',
+                  background: 'rgba(255,255,255,0.2)',
+                  border: '1px solid rgba(255,255,255,0.3)',
+                  color: 'white', borderRadius: '50%',
+                  width: '36px', height: '36px', fontSize: '18px',
+                  cursor: 'pointer', display: 'flex',
+                  alignItems: 'center', justifyContent: 'center',
+                }}
+              >
+                ‹
+              </button>
+              <button
+                onClick={() => setSlideActual(prev => (prev + 1) % slides.length)}
+                style={{
+                  position: 'absolute', right: '12px', top: '50%',
+                  transform: 'translateY(-50%)',
+                  background: 'rgba(255,255,255,0.2)',
+                  border: '1px solid rgba(255,255,255,0.3)',
+                  color: 'white', borderRadius: '50%',
+                  width: '36px', height: '36px', fontSize: '18px',
+                  cursor: 'pointer', display: 'flex',
+                  alignItems: 'center', justifyContent: 'center',
+                }}
+              >
+                ›
+              </button>
+            </>
+          )}
+        </section>
+      )}
+
+      {/* ── Filtros de sector ── */}
       <FiltroSectores
         sectores={sectores}
         sectorActivo={sectorActivo}
         onCambiar={setSectorActivo}
       />
 
-      {/* Contenido principal */}
+      {/* ── Grilla de cursos ── */}
       <main style={{ flex: 1, padding: '20px 24px' }}>
-
-        {/* Etiqueta de sección */}
-        <p style={{ fontSize: '12px', color: 'var(--texto-suave)', marginBottom: '14px', fontWeight: '500', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+        <p style={{
+          fontSize: '12px',
+          color: '#6b7280',
+          marginBottom: '14px',
+          fontWeight: '500',
+          textTransform: 'uppercase',
+          letterSpacing: '0.5px',
+        }}>
           {nombreSectorActivo ?? 'Todos los sectores'} — {cursosFiltrados.length} programa{cursosFiltrados.length !== 1 ? 's' : ''}
         </p>
 
         {cargando ? (
-          <p style={{ color: 'var(--texto-suave)', textAlign: 'center', padding: '60px 0' }}>
+          <p style={{ color: '#6b7280', textAlign: 'center', padding: '60px 0' }}>
             Cargando programas...
           </p>
         ) : cursosFiltrados.length === 0 ? (
-          <p style={{ color: 'var(--texto-suave)', textAlign: 'center', padding: '60px 0' }}>
+          <p style={{ color: '#6b7280', textAlign: 'center', padding: '60px 0' }}>
             No hay programas en este sector.
           </p>
         ) : (
@@ -115,15 +245,34 @@ export default function Inicio() {
         )}
       </main>
 
-      {/* Footer */}
+      {/* ── Footer ── */}
       <footer style={{
-        background: 'var(--verde-oscuro)',
-        color: 'rgba(255,255,255,0.7)',
-        textAlign: 'center',
-        padding: '16px',
-        fontSize: '12px',
+        background: '#1a5c00',
+        padding: '20px 24px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        flexWrap: 'wrap',
+        gap: '12px',
       }}>
-        <strong style={{ color: 'white' }}>SENA</strong> · Servicio Nacional de Aprendizaje · Formación gratuita para Colombia
+        <div>
+          <p style={{ color: 'white', fontWeight: '600', fontSize: '13px' }}>
+            SENA · Servicio Nacional de Aprendizaje
+          </p>
+          <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: '12px', marginTop: '2px' }}>
+            Formación gratuita para Colombia
+          </p>
+        </div>
+        <div style={{
+          background: '#5b2d8e',
+          color: 'white',
+          padding: '5px 14px',
+          borderRadius: '20px',
+          fontSize: '12px',
+          fontWeight: '500',
+        }}>
+          Doblemente titulados
+        </div>
       </footer>
 
     </div>

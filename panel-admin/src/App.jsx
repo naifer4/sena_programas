@@ -6,6 +6,7 @@ import Login from './pages/Login'
 import Dashboard from './pages/Dashboard'
 import FormCurso from './pages/FormCurso'
 import RutaProtegida from './components/RutaProtegida'
+import Banners from './pages/Banners'
 
 export default function App() {
   // sesion: null = cargando, false = sin sesión, objeto = con sesión
@@ -60,6 +61,14 @@ export default function App() {
           }
         />
         <Route path="*" element={<Navigate to="/" />} />
+        <Route
+          path="/banners"
+          element={
+            <RutaProtegida sesion={sesion}>
+              <Banners />
+            </RutaProtegida>
+          }
+        />
       </Routes>
     </BrowserRouter>
   )

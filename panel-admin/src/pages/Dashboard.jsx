@@ -129,6 +129,9 @@ export default function Dashboard() {
                 >
                   Eliminar
                 </button>
+                <button className="btn btn-gris" onClick={() => navegar('/banners')}>
+                    Gestionar banners
+                </button>
               </div>
 
             </div>
