@@ -1,0 +1,36 @@
+/* sitio-publico/src/index.css */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --verde: #39A900;
+  --verde-oscuro: #1a5c00;
+  --verde-claro: #e8f5e0;
+  --verde-medio: #c8e6b0;
+  --texto: #1a1a1a;
+  --texto-suave: #6b7280;
+  --borde: #e5e7eb;
+}
+
+body {
+  font-family: system-ui, -apple-system, sans-serif;
+  background: #f9f9f9;
+  color: var(--texto);
+  font-size: 15px;
+}
+
+/* Botón principal */
+.btn-verde {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 16px;
+  background: var(--verde);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background 0.15s;
+}
+.btn-verde:hover { background: var(--verde-oscuro); }
