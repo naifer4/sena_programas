@@ -37,16 +37,11 @@ export default function Login() {
 
         {/* Logo SENA */}
         <div style={{ textAlign: 'center', marginBottom: '24px' }}>
-          <div style={{
-            width: '52px', height: '52px',
-            background: '#39A900',
-            borderRadius: '12px',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            margin: '0 auto 12px',
-            color: 'white', fontWeight: '700', fontSize: '16px',
-          }}>
-            SENA
-          </div>
+        <img
+            src="/logo-sena.png"
+            alt="Logo SENA"
+            style={{ width: '72px', margin: '0 auto 12px', display: 'block' }}
+          />
           <h1 style={{ fontSize: '18px', fontWeight: '600' }}>Panel de administración</h1>
           <p style={{ fontSize: '13px', color: '#6b7280', marginTop: '4px' }}>
             Ingresa con tu cuenta institucional
