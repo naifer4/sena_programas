@@ -114,7 +114,7 @@ export default function TarjetaCurso({ curso }) {
               color: expandido ? 'var(--verde-oscuro)' : 'white',
               border: 'none', borderRadius: '8px',
               padding: '8px 14px', fontSize: '13px', fontWeight: '500',
-              cursor: 'pointer', alignSelf: 'flex-start',
+              cursor: 'pointer', alignSelf: 'center',
               transition: 'all 0.15s',
             }}
           >
@@ -126,7 +126,7 @@ export default function TarjetaCurso({ curso }) {
           <div style={{
             padding: '12px 16px',
             borderTop: '1px solid var(--borde)',
-            display: 'flex', justifyContent: 'flex-end',
+            display: 'flex', justifyContent: 'center',
           }}>
             <a href={curso.url_mas_info} target="_blank" rel="noreferrer" className="btn-verde">
               Más información
