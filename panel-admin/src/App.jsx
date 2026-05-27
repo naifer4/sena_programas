@@ -7,6 +7,7 @@ import Dashboard from './pages/Dashboard'
 import FormCurso from './pages/FormCurso'
 import RutaProtegida from './components/RutaProtegida'
 import Banners from './pages/Banners'
+import Configuracion from './pages/Configuracion'
 
 export default function App() {
   // sesion: null = cargando, false = sin sesión, objeto = con sesión
@@ -69,6 +70,14 @@ export default function App() {
             </RutaProtegida>
           }
         />
+        <Route
+        path="/configuracion"
+        element={
+          <RutaProtegida sesion={sesion}>
+            <Configuracion />
+        </RutaProtegida>
+      }
+    />
       </Routes>
     </BrowserRouter>
   )

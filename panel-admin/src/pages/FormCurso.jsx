@@ -4,7 +4,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 
 export default function FormCurso() {
-  const { id } = useParams()           // si existe, estamos editando
+  const { id } = useParams()
   const esEdicion = Boolean(id)
   const navegar = useNavigate()
 
@@ -17,8 +17,9 @@ export default function FormCurso() {
   const [nombre, setNombre] = useState('')
   const [descripcion, setDescripcion] = useState('')
   const [sectorId, setSectorId] = useState('')
-  const [competencias, setCompetencias] = useState('')   // string separado por comas
+  const [competencias, setCompetencias] = useState('')
   const [urlMasInfo, setUrlMasInfo] = useState('')
+  const [videoUrl, setVideoUrl] = useState('')
   const [activo, setActivo] = useState(true)
 
   useEffect(() => {
@@ -44,9 +45,9 @@ export default function FormCurso() {
       setNombre(data.nombre)
       setDescripcion(data.descripcion ?? '')
       setSectorId(data.sector_id ?? '')
-      // competencias es un array en la BD, lo convertimos a texto para el input
       setCompetencias((data.competencias ?? []).join(', '))
       setUrlMasInfo(data.url_mas_info ?? '')
+      setVideoUrl(data.video_url ?? '')
       setActivo(data.activo)
     }
     setCargando(false)
@@ -57,7 +58,6 @@ export default function FormCurso() {
     setGuardando(true)
     setError('')
 
-    // Convierte el texto de competencias a arreglo limpio
     const arregloCompetencias = competencias
       .split(',')
       .map(c => c.trim())
@@ -69,6 +69,7 @@ export default function FormCurso() {
       sector_id: sectorId || null,
       competencias: arregloCompetencias,
       url_mas_info: urlMasInfo || null,
+      video_url: videoUrl || null,
       activo,
     }
 
@@ -85,7 +86,7 @@ export default function FormCurso() {
     if (errorGuardado) {
       setError('No se pudo guardar el curso. Intenta de nuevo.')
     } else {
-      navegar('/')    // vuelve al dashboard
+      navegar('/')
     }
 
     setGuardando(false)
@@ -155,6 +156,19 @@ export default function FormCurso() {
             />
             <p style={{ fontSize: '12px', color: '#9ca3af', marginTop: '4px' }}>
               Separa cada competencia con una coma
+            </p>
+          </div>
+
+          <div className="campo">
+            <label>URL de video YouTube (opcional)</label>
+            <input
+              type="url"
+              placeholder="https://www.youtube.com/watch?v=..."
+              value={videoUrl}
+              onChange={e => setVideoUrl(e.target.value)}
+            />
+            <p style={{ fontSize: '12px', color: '#9ca3af', marginTop: '4px' }}>
+              Pega el enlace normal de YouTube, lo convertimos automáticamente.
             </p>
           </div>
 

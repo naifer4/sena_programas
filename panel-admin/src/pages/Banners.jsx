@@ -1,8 +1,10 @@
 // panel-admin/src/pages/Banners.jsx
 import { useEffect, useState, useRef } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 
 export default function Banners() {
+    const navegar = useNavigate()
   const [banners, setBanners] = useState([])
   const [cargando, setCargando] = useState(true)
   const [subiendo, setSubiendo] = useState(false)
@@ -118,7 +120,13 @@ export default function Banners() {
 
   return (
     <div style={{ maxWidth: '760px', margin: '0 auto', padding: '24px' }}>
-
+    <button
+        className="btn btn-gris"
+        style={{ marginBottom: '16px', fontSize: '13px', padding: '6px 12px' }}
+        onClick={() => navegar('/')}
+      >
+        ← Volver al panel
+      </button>
       <h1 style={{ fontSize: '20px', fontWeight: '600', marginBottom: '6px' }}>
         Banners del sitio
       </h1>

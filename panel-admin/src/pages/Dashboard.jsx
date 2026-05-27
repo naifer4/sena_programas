@@ -67,6 +67,12 @@ export default function Dashboard() {
           <button className="btn btn-verde" onClick={() => navegar('/curso/nuevo')}>
             + Nuevo curso
           </button>
+        <button className="btn btn-gris" onClick={() => navegar('/banners')}>
+                    Gestionar banners
+        </button>
+        <button className="btn btn-gris" onClick={() => navegar('/configuracion')}>
+            Configuración
+        </button>
           <button className="btn btn-gris" onClick={cerrarSesion}>
             Cerrar sesión
           </button>
@@ -128,9 +134,6 @@ export default function Dashboard() {
                   onClick={() => eliminarCurso(curso.id)}
                 >
                   Eliminar
-                </button>
-                <button className="btn btn-gris" onClick={() => navegar('/banners')}>
-                    Gestionar banners
                 </button>
               </div>
 
