@@ -38,7 +38,7 @@ export default function Login() {
         {/* Logo SENA */}
         <div style={{ textAlign: 'center', marginBottom: '24px' }}>
         <img
-            src="/logo-sena.png"
+            src="/favicon.png"
             alt="Logo SENA"
             style={{ width: '72px', margin: '0 auto 12px', display: 'block' }}
           />
