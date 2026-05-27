@@ -8,6 +8,7 @@ export default function Inicio() {
   const [cursos, setCursos] = useState([])
   const [sectores, setSectores] = useState([])
   const [slides, setSlides] = useState([])
+  const [imagenHeader, setImagenHeader] = useState('')
   const [sectorActivo, setSectorActivo] = useState(null)
   const [cargando, setCargando] = useState(true)
   const [slideActual, setSlideActual] = useState(0)
@@ -26,7 +27,12 @@ export default function Inicio() {
   }, [])
 
   async function cargarDatos() {
-    const [resBanners, resSectores, resCursos] = await Promise.all([
+    const [resConfig, resBanners, resSectores, resCursos] = await Promise.all([
+      supabase
+        .from('configuracion')
+        .select('valor')
+        .eq('clave', 'imagen_header')
+        .single(),
       supabase
         .from('banners')
         .select('*')
@@ -43,6 +49,7 @@ export default function Inicio() {
         .order('creado_en', { ascending: false }),
     ])
 
+    if (resConfig.data?.valor) setImagenHeader(resConfig.data.valor)
     if (resBanners.data) setSlides(resBanners.data)
     if (resSectores.data) setSectores(resSectores.data)
     if (resCursos.data) setCursos(resCursos.data)
@@ -61,45 +68,15 @@ export default function Inicio() {
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
 
       {/* ── Encabezado ── */}
-      <header style={{
-        background: 'white',
-        borderBottom: '1px solid #e5e7eb',
-        padding: '10px 24px',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <div style={{
-            width: '44px', height: '44px',
-            background: '#39A900',
-            borderRadius: '8px',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            color: 'white', fontWeight: '700', fontSize: '12px',
-            flexShrink: 0,
-          }}>
-            SENA
-          </div>
-          <div>
-            <p style={{ fontWeight: '600', fontSize: '14px', color: '#1a1a1a' }}>
-              Centro de Desarrollo Agroindustrial, Turístico y Tecnológico del Guaviare
-            </p>
-            <p style={{ fontSize: '12px', color: '#6b7280' }}>
-              CDATTG · Regional Guaviare
-            </p>
-          </div>
-        </div>
-        <div style={{
-          background: '#5b2d8e',
-          color: 'white',
-          padding: '5px 14px',
-          borderRadius: '20px',
-          fontSize: '12px',
-          fontWeight: '500',
-          whiteSpace: 'nowrap',
-        }}>
-          Articulación con la Media
-        </div>
+      {/* ── Encabezado ── */}
+      <header style={{ background: 'white', borderBottom: '1px solid #e5e7eb' }}>
+        {imagenHeader && (
+          <img
+            src={imagenHeader}
+            alt="Encabezado SENA CDATTG"
+            style={{ width: '100%', display: 'block', maxHeight: '200px', objectFit: 'cover' }}
+          />
+        )}
       </header>
 
       {/* ── Banner slider con imágenes reales ── */}
@@ -129,9 +106,7 @@ export default function Inicio() {
 
           {/* Texto sobre la imagen */}
           {(slides[slideActual]?.titulo || slides[slideActual]?.subtitulo) && (
-            <div style={{
-              position: 'absolute', bottom: '40px', left: '32px',
-            }}>
+            <div style={{ position: 'absolute', bottom: '40px', left: '32px' }}>
               {slides[slideActual]?.titulo && (
                 <h1 style={{ color: 'white', fontSize: '26px', fontWeight: '700', marginBottom: '4px' }}>
                   {slides[slideActual].titulo}
@@ -251,27 +226,20 @@ export default function Inicio() {
         padding: '20px 24px',
         display: 'flex',
         alignItems: 'center',
-        justifyContent: 'space-between',
+        justifyContent: 'center',
         flexWrap: 'wrap',
         gap: '12px',
       }}>
-        <div>
+        <div style={{ textAlign: 'center' }}>
           <p style={{ color: 'white', fontWeight: '600', fontSize: '13px' }}>
             SENA · Servicio Nacional de Aprendizaje
           </p>
           <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: '12px', marginTop: '2px' }}>
+            Regional Guaviare 
+          </p>
+          <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: '12px', marginTop: '2px' }}>
             Formación gratuita para Colombia
           </p>
-        </div>
-        <div style={{
-          background: '#5b2d8e',
-          color: 'white',
-          padding: '5px 14px',
-          borderRadius: '20px',
-          fontSize: '12px',
-          fontWeight: '500',
-        }}>
-          Doblemente titulados
         </div>
       </footer>
 
