@@ -1,6 +1,6 @@
 // sitio-publico/src/pages/Inicio.jsx
 import { useEffect, useState } from 'react'
-import { supabase } from '../lib/supabase'
+import { leer, leerUno } from '../lib/api'
 import TarjetaCurso from '../components/TarjetaCurso'
 import FiltroSectores from '../components/FiltroSectores'
 
@@ -26,35 +26,26 @@ export default function Inicio() {
     cargarDatos()
   }, [])
 
-  async function cargarDatos() {
-    const [resConfig, resBanners, resSectores, resCursos] = await Promise.all([
-      supabase
-        .from('configuracion')
-        .select('valor')
-        .eq('clave', 'imagen_header')
-        .single(),
-      supabase
-        .from('banners')
-        .select('*')
-        .eq('activo', true)
-        .order('orden', { ascending: true }),
-      supabase
-        .from('sectores')
-        .select('*')
-        .order('orden'),
-      supabase
-        .from('cursos')
-        .select('*, sectores(nombre)')
-        .eq('activo', true)
-        .order('creado_en', { ascending: false }),
+async function cargarDatos() {
+  try {
+    const [config, banners, sectores, cursos] = await Promise.all([
+      leerUno('configuracion?select=valor&clave=eq.imagen_header'),
+      leer('banners?select=*&activo=eq.true&order=orden.asc'),
+      leer('sectores?select=*&order=orden'),
+      leer('cursos?select=*,sectores(nombre)&activo=eq.true&order=creado_en.desc'),
     ])
 
-    if (resConfig.data?.valor) setImagenHeader(resConfig.data.valor)
-    if (resBanners.data) setSlides(resBanners.data)
-    if (resSectores.data) setSectores(resSectores.data)
-    if (resCursos.data) setCursos(resCursos.data)
+    if (config?.valor) setImagenHeader(config.valor)
+    setSlides(banners)
+    setSectores(sectores)
+    setCursos(cursos)
+  } catch (err) {
+    console.error('Error cargando datos:', err)
+  
+  } finally {
     setCargando(false)
   }
+}
 
   const cursosFiltrados = sectorActivo
     ? cursos.filter(c => c.sector_id === sectorActivo)
