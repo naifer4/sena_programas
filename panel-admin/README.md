@@ -1,16 +1,62 @@
-# React + Vite
+# Oferta AMT — Panel de administración
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Backoffice para gestionar la oferta de programas de formación del SENA Regional Guaviare. Acceso restringido por autenticación.
 
-Currently, two official plugins are available:
+## Stack
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- **React 19** + **Vite**
+- **React Router 7** (navegación entre páginas)
+- **Supabase** — auth, base de datos y storage de imágenes
+- **Vercel** (hosting)
 
-## React Compiler
+## Funcionalidades
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- Login con email/contraseña
+- CRUD de cursos (crear, editar, activar/desactivar, eliminar)
+- Gestión de banners del slider público (upload, orden, visibilidad)
+- Cambio de la imagen del header del sitio público
 
-## Expanding the ESLint configuration
+## Levantar en local
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+```bash
+npm install
+cp .env.example .env.local   # edita los valores
+npm run dev
+```
+
+## Variables de entorno
+
+```env
+VITE_SUPABASE_URL=https://TU-PROYECTO.supabase.co
+VITE_SUPABASE_ANON_KEY=eyJh...
+```
+
+## Estructura
+
+```
+src/
+├── lib/supabase.js              ← Cliente @supabase/supabase-js
+├── components/RutaProtegida.jsx ← Guard de auth para rutas privadas
+├── pages/
+│   ├── Login.jsx
+│   ├── Dashboard.jsx
+│   ├── FormCurso.jsx            ← Crear y editar (misma vista)
+│   ├── Banners.jsx
+│   └── Configuracion.jsx
+└── App.jsx                      ← Definición de rutas
+```
+
+## Permisos en Supabase
+
+Las tablas requieren RLS activado con policies que permitan INSERT/UPDATE/DELETE solo a usuarios autenticados:
+
+```sql
+CREATE POLICY "auth users full access" ON cursos
+  FOR ALL USING (auth.role() = 'authenticated');
+```
+
+(Repetir para `banners`, `sectores`, `configuracion`.)
+
+## Crear un usuario admin
+
+Desde el dashboard de Supabase → Authentication → Users → Add user → "Create new user".
